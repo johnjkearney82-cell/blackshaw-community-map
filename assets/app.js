@@ -346,21 +346,6 @@
   /* ---------- controls ---------- */
   document.getElementById("zin").onclick = () => map.zoomIn();
   document.getElementById("zout").onclick = () => map.zoomOut();
-  let meLayer = null;
-  document.getElementById("locate").onclick = () => {
-    if (!navigator.geolocation) return toast("Your browser can't share your location.");
-    toast("Finding you…");
-    navigator.geolocation.getCurrentPosition(pos => {
-      const ll = [pos.coords.latitude, pos.coords.longitude];
-      if (meLayer) meLayer.remove();
-      meLayer = L.layerGroup([
-        L.circle(ll, { radius: Math.min(pos.coords.accuracy, 300), className: "me-acc", weight: 1, interactive: false }),
-        L.circleMarker(ll, { radius: 7, className: "me-dot", interactive: false })
-      ]).addTo(map);
-      map.flyTo(ll, 17, { duration: .6 });
-      document.getElementById("toast").hidden = true;
-    }, () => toast("Couldn't get your location. Check location is allowed for this site."), { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
-  };
   const fsBtn = document.getElementById("fs");
   const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
   function setFull(on) {

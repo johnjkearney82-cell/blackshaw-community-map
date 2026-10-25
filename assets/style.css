@@ -88,8 +88,6 @@ h1{font-family:var(--f-display);font-weight:400;font-size:1.35rem;line-height:1.
 .map-far .lbl{display:none}
 .lbl.sel{display:block!important;color:var(--focus)}
 .boundary{stroke:var(--heather);stroke-width:2.5;stroke-dasharray:2 7;stroke-linecap:round;fill:var(--heather);fill-opacity:.035}
-.me-dot{fill:var(--focus);fill-opacity:1;stroke:var(--paper);stroke-width:3}
-.me-acc{fill:var(--focus);fill-opacity:.08;stroke:var(--focus);stroke-opacity:.5}
 
 .legend{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:12px;background:var(--paper);border:1px solid var(--wall);border-radius:4px;padding:8px 11px;font-family:var(--f-hand);font-size:.9rem;line-height:1.2;display:grid;gap:4px;z-index:1000;box-shadow:2px 2px 0 color-mix(in srgb,var(--wall) 35%,transparent)}
 .legend span{display:flex;align-items:center;gap:7px}
