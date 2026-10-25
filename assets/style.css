@@ -1,0 +1,169 @@
+/* Blackshaw Head Community Map
+   Look: an illustrated country map. Soft, warm OpenStreetMap base; gritstone cottages;
+   heather for neighbours' houses; handwritten lane-style labels.
+   Layout: phone = header, map, bottom sheet. Desktop (900px+) = sidebar + map. */
+:root{
+  --ground:#e9ecdc;
+  --paper:#fbfaf3;
+  --ink:#2e2b24;
+  --muted:#6e6a5a;
+  --line:#d3d3c0;
+  --field1:#dfe6c9;
+  --field2:#d2dcb6;
+  --wall:#8f8770;
+  --tree:#7d9a5c;
+  --stone:#b5762f;
+  --roof:#5b4a3a;
+  --heather:#8a4686;
+  --focus:#1f5e8c;
+  --target:#d6301a;
+  --ok:#2f6b3a;
+  --err:#b3261e;
+  --tiles:sepia(.28) saturate(.72) hue-rotate(-8deg) brightness(1.04) contrast(.94);
+  --f-display:"Gloock",Georgia,"Times New Roman",serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-hand:"Kalam","Segoe Print","Bradley Hand",cursive;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#1d201a;--paper:#24271f;--ink:#ecebe0;--muted:#a6a493;--line:#3b3f33;
+  --field1:#262c20;--field2:#2b3223;--wall:#6c6655;--tree:#5f7a45;
+  --stone:#dca35e;--roof:#c9b49b;--heather:#cf93cb;--focus:#7fb6e0;--target:#ff6a4d;--ok:#8fd19e;--err:#ff8a80;
+  --tiles:invert(1) hue-rotate(180deg) brightness(.88) contrast(.88) saturate(.45) sepia(.15);
+  color-scheme:dark}}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+[hidden]{display:none!important}
+
+.app{height:100%;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:1fr;padding-top:env(safe-area-inset-top,0px)}
+.side{display:contents}
+header{grid-row:1;background:var(--paper);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;
+  display:grid;gap:10px;z-index:1001}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.titlewrap{display:flex;align-items:flex-end;gap:10px;min-width:0}
+h1{font-family:var(--f-display);font-weight:400;font-size:1.35rem;line-height:1.1;margin:0;text-wrap:balance}
+.where{font-family:var(--f-hand);font-size:.95rem;color:var(--muted)}
+.hills{width:64px;height:20px;flex:none;overflow:visible}
+.h-back{fill:var(--field2)}.h-front{fill:var(--tree);opacity:.55}
+.h-wall{fill:none;stroke:var(--wall);stroke-width:1;stroke-dasharray:3 1.5}
+.h-tree circle{fill:var(--tree)}.h-tree line{stroke:var(--roof);stroke-width:1.2}
+.h-house{fill:var(--stone);stroke:var(--ink);stroke-width:.8;stroke-linejoin:round}
+
+.searchrow{display:flex;gap:8px}
+.search{flex:1;min-width:0;position:relative}
+.search input{width:100%;padding:11px 12px 11px 38px;border:1px solid var(--line);border-radius:8px;background:var(--ground);font-size:16px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:10px 14px;cursor:pointer;white-space:nowrap;font-weight:700;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--heather);border-color:var(--heather);color:var(--paper)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.btn.ghost{background:transparent}
+
+.mapwrap{grid-row:2;position:relative;min-height:0;overflow:hidden;background:var(--field1)}
+#map{position:absolute;inset:0;background:var(--field1);font-family:var(--f-body)}
+.leaflet-tile-pane{filter:var(--tiles)}
+.leaflet-container a{color:var(--focus)}
+.leaflet-control-attribution{font-size:11px;background:color-mix(in srgb,var(--paper) 85%,transparent)!important;color:var(--muted)}
+.leaflet-control-attribution a{color:var(--muted)!important}
+
+/* cottages */
+.cot{background:none;border:0}
+.cot svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(1px 1.5px 0 color-mix(in srgb,var(--ink) 25%,transparent))}
+.cot .wall{stroke:var(--ink);stroke-width:1.3;stroke-linejoin:round}
+.cot .roof{fill:var(--roof)}
+.cot.listed .wall{fill:var(--stone)}
+.cot.added .wall{fill:var(--heather)}
+.cot.landmark .wall{fill:var(--paper)}
+.cot.sel .wall{stroke:var(--focus);stroke-width:2.4}
+/* labels: shown when zoomed in, or for the selected house */
+.lbl.leaflet-tooltip{background:none;border:0;box-shadow:none;padding:0 2px;font-family:var(--f-body);font-weight:700;font-size:12.5px;color:var(--ink);
+  text-shadow:0 0 3px var(--paper),0 0 3px var(--paper),0 0 2px var(--paper),0 0 1px var(--paper);white-space:nowrap}
+.lbl.leaflet-tooltip::before{display:none}
+.map-far .lbl{display:none}
+.lbl.sel{display:block!important;color:var(--focus)}
+.boundary{stroke:var(--heather);stroke-width:2.5;stroke-dasharray:2 7;stroke-linecap:round;fill:var(--heather);fill-opacity:.035}
+.me-dot{fill:var(--focus);fill-opacity:1;stroke:var(--paper);stroke-width:3}
+.me-acc{fill:var(--focus);fill-opacity:.08;stroke:var(--focus);stroke-opacity:.5}
+
+.legend{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:12px;background:var(--paper);border:1px solid var(--wall);border-radius:4px;padding:8px 11px;font-family:var(--f-hand);font-size:.9rem;line-height:1.2;display:grid;gap:4px;z-index:1000;box-shadow:2px 2px 0 color-mix(in srgb,var(--wall) 35%,transparent)}
+.legend span{display:flex;align-items:center;gap:7px}
+.lg{width:14px;height:14px;flex:none}
+.lg path{stroke:var(--ink);stroke-width:1;stroke-linejoin:round}
+.tools{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:12px;display:grid;gap:6px;z-index:1000}
+.tools button{width:40px;height:40px;border-radius:8px;border:1px solid var(--wall);background:var(--paper);font-size:20px;line-height:1;cursor:pointer;font-family:var(--f-hand);display:grid;place-items:center;padding:0}
+.ti{width:18px;height:18px;fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fs-close{display:none}
+.app.full .fs-open{display:none}.app.full .fs-close{display:inline}
+
+.cross{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;pointer-events:none;z-index:1000}
+.cross svg{width:100%;height:100%;display:block;overflow:visible}
+.cross .halo{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round}
+.cross .arm{fill:none;stroke:var(--target);stroke-width:3;stroke-linecap:round}
+.cross .ctr{fill:var(--target);stroke:#fff;stroke-width:1.5}
+@media (prefers-reduced-motion:no-preference){.cross .ring{animation:pulse 1.6s ease-out infinite;transform-origin:32px 32px}}
+@keyframes pulse{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.5)}}
+.addhint{position:absolute;left:50%;transform:translateX(-50%);top:12px;background:var(--target);color:#fff;padding:8px 12px;border-radius:8px;font-size:.9rem;font-weight:700;z-index:1001;max-width:calc(100% - 130px);text-align:center}
+.toast{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:8px;font-size:.9rem;z-index:1002;max-width:calc(100% - 32px)}
+
+.sheet{grid-row:3;background:var(--paper);border-top:1px solid var(--line);max-height:46vh;overflow:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(14px + env(safe-area-inset-bottom,0px));z-index:1001}
+.eyebrow{font-family:var(--f-hand);font-size:1rem;color:var(--muted);margin:0 0 6px}
+.results{list-style:none;margin:0;padding:0;display:grid}
+.results li button{width:100%;text-align:left;background:none;border:0;border-bottom:1px dashed var(--line);padding:10px 0;cursor:pointer;display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center}
+.results li:last-child button{border-bottom:0}
+.results li button:hover .nm{color:var(--focus)}
+.results .nm{font-weight:700;min-width:0}
+.results .ln{color:var(--muted);font-size:.85rem}
+.place h2{font-family:var(--f-display);font-weight:400;font-size:1.4rem;line-height:1.15;margin:0 0 4px;text-wrap:balance}
+.place .meta{color:var(--muted);margin:0 0 10px}
+.place .note{margin:0 0 12px;max-width:60ch}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0 0 14px;font-size:.92rem}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;font-variant-numeric:tabular-nums}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.empty{color:var(--muted);margin:0;max-width:60ch}
+form{display:grid;gap:12px;max-width:520px}
+label{display:grid;gap:4px;font-weight:700;font-size:.92rem}
+label small{font-weight:400;color:var(--muted)}
+form input,form select,form textarea{padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--ground);font-size:16px;font-weight:400;width:100%}
+form textarea{min-height:64px;resize:vertical}
+.check{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-weight:400}
+.check input{width:20px;height:20px;margin-top:2px}
+.hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
+.msg{font-size:.92rem;margin:0}
+.msg.err{color:var(--err)}
+.msg.ok{color:var(--ok);font-weight:700}
+.about{font-size:.85rem;color:var(--muted);margin-top:14px;border-top:1px solid var(--line);padding-top:10px;max-width:62ch}
+.about p{margin:0 0 6px}
+.about a{color:inherit}
+
+/* full screen: map only, details float as a card */
+.app.full{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
+.app.full .side{display:contents!important}
+.app.full header{display:none}
+.app.full .mapwrap{grid-column:1!important;grid-row:1!important}
+.app.full .sheet{display:none}
+.app.full.has-sel .sheet,.app.full.adding .sheet{display:block;position:fixed;z-index:1003;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:460px;max-height:50vh;border:1px solid var(--wall);border-radius:6px;box-shadow:3px 3px 0 color-mix(in srgb,var(--wall) 35%,transparent)}
+
+@media (min-width:900px){
+  .app{grid-template-columns:380px 1fr;grid-template-rows:1fr}
+  .side{display:grid;grid-template-rows:auto 1fr;grid-column:1;grid-row:1;min-height:0;border-right:1px solid var(--line);background:var(--paper)}
+  .sheet{grid-row:2;max-height:none;border-top:0}
+  .mapwrap{grid-column:2;grid-row:1}
+}
+@media (max-width:420px){.legend{font-size:.8rem;padding:6px 8px}.addhint{max-width:calc(100% - 110px)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* privacy page */
+.doc{overflow:auto;height:100%}
+.doc main{max-width:680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 48px}
+.doc h1{font-size:1.8rem;margin-bottom:12px}
+.doc h2{font-family:var(--f-display);font-weight:400;font-size:1.2rem;margin:24px 0 6px}
+.doc p,.doc li{max-width:65ch}
+.doc a{color:var(--focus)}

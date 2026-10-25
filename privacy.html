@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Privacy · Blackshaw Head Community Map</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloock&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="doc">
+<main>
+  <p><a href="./">← Back to the map</a></p>
+  <h1>Privacy notice</h1>
+  <p>The Blackshaw Head Community Map helps drivers, visitors and neighbours find houses in Blackshaw parish by name. This notice explains what we collect when you add a house, and what we do with it.</p>
+
+  <h2>Who runs the map</h2>
+  <p>The map is run by volunteers for the Blackshaw Head community. <!-- When the parish council adopts the map, name it here as the data controller. --> Contact: <span id="contact">the organiser</span>.</p>
+
+  <h2>What we publish</h2>
+  <p>Only the house name, its position on the map, the lane, and any "how to spot it" note you give. We never publish who lives at a house.</p>
+
+  <h2>What we keep privately</h2>
+  <p>Your email address, so we can tell you when your house is approved. It is stored in a Google Sheet that only the map's volunteers can open. It is deleted as soon as we've sent you that email.</p>
+
+  <h2>Why we use it</h2>
+  <p>We use your email only to tell you about your entry. We don't add you to a mailing list or share it with anyone.</p>
+
+  <h2>Changing or removing a house</h2>
+  <p>Reply to any email we send you, or contact us at the address above, and we'll correct or remove the house.</p>
+
+  <h2>Other services</h2>
+  <p>The background map comes from OpenStreetMap, and the parish boundary from mySociety's MapIt. Your browser contacts them to show the map. The "Directions" button opens Google Maps. If you use "Show where I am", your location stays on your device and is never sent to us.</p>
+
+  <h2>Listed buildings</h2>
+  <p>Names and positions of listed buildings come from the National Heritage List for England, published by Historic England.</p>
+</main>
+<script src="config.js"></script>
+<script>
+  try { if (window.MAP_CONFIG && MAP_CONFIG.contactEmail) document.getElementById("contact").textContent = MAP_CONFIG.contactEmail; } catch (_) {}
+</script>
+</body>
+</html>

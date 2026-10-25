@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Blackshaw Head Community Map</title>
+<meta name="description" content="Find houses in Blackshaw Head by name. A community map for drivers, visitors and neighbours in Blackshaw parish, HX7.">
+<meta name="theme-color" content="#fbfaf3">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloock&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <div class="side">
+    <header>
+      <div class="brand">
+        <div class="titlewrap">
+          <svg class="hills" viewBox="0 0 120 34" aria-hidden="true">
+            <path class="h-back" d="M0 30 C18 10 34 8 52 20 C66 9 86 4 120 24 L120 34 L0 34Z"></path>
+            <path class="h-front" d="M0 34 C22 20 44 18 66 28 C82 22 100 22 120 30 L120 34Z"></path>
+            <path class="h-wall" d="M8 31 C30 23 48 23 66 30 M70 29 C86 25 102 25 116 31"></path>
+            <g class="h-tree"><circle cx="92" cy="15" r="4.5"></circle><line x1="92" y1="19" x2="92" y2="23"></line></g>
+            <path class="h-house" d="M40 24 L40 18 L44 14.5 L48 18 L48 24Z"></path>
+          </svg>
+          <h1>Blackshaw Head Community Map</h1>
+        </div>
+        <span class="where">Blackshaw parish · HX7</span>
+      </div>
+      <div class="searchrow">
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+          <input id="q" type="search" placeholder="Search for a house" autocomplete="off" aria-label="Search for a house">
+        </div>
+        <button class="btn primary" id="addBtn" type="button">Add your house</button>
+      </div>
+    </header>
+    <section class="sheet" id="sheet" aria-live="polite"></section>
+  </div>
+  <div class="mapwrap">
+    <div id="map" aria-label="Map of Blackshaw parish with house names"></div>
+    <div class="legend" aria-hidden="true">
+      <span><svg class="lg" viewBox="0 0 14 14"><path d="M2 13V6.5L7 2l5 4.5V13Z" style="fill:var(--stone)"></path></svg>Listed building</span>
+      <span><svg class="lg" viewBox="0 0 14 14"><path d="M2 13V6.5L7 2l5 4.5V13Z" style="fill:var(--heather)"></path></svg>Added by a neighbour</span>
+      <span><svg class="lg" viewBox="0 0 14 14"><path d="M7 1.5L12.5 7 7 12.5 1.5 7Z" style="fill:var(--paper)"></path></svg>Inn or landmark</span>
+    </div>
+    <div class="tools">
+      <button type="button" id="zin" aria-label="Zoom in">+</button>
+      <button type="button" id="zout" aria-label="Zoom out">−</button>
+      <button type="button" id="locate" aria-label="Show where I am" title="Show where I am"><svg viewBox="0 0 20 20" class="ti" aria-hidden="true"><circle cx="10" cy="10" r="4"></circle><path d="M10 1v3M10 16v3M1 10h3M16 10h3"></path></svg></button>
+      <button type="button" id="fs" aria-label="Full screen map" aria-pressed="false" title="Full screen"><svg viewBox="0 0 20 20" class="ti" aria-hidden="true"><path class="fs-open" d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5"></path><path class="fs-close" d="M8 3v5H3M17 8h-5V3M12 17v-5h5M3 12h5v5"></path></svg></button>
+    </div>
+    <div class="cross" id="cross" hidden><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ring arm" cx="32" cy="32" r="18"></circle><path class="halo" d="M32 4V22M32 42V60M4 32H22M42 32H60"></path><circle class="halo" cx="32" cy="32" r="12"></circle><path class="arm" d="M32 4V22M32 42V60M4 32H22M42 32H60"></path><circle class="arm" cx="32" cy="32" r="12"></circle><circle class="ctr" cx="32" cy="32" r="3"></circle></svg></div>
+    <div class="addhint" id="addhint" hidden>Drag the map so the cross is on your house</div>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </div>
+</div>
+<noscript><p style="padding:16px">This map needs JavaScript switched on.</p></noscript>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
