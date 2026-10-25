@@ -24,7 +24,7 @@ const SETTINGS = {
   SEND_REJECTION_EMAIL: false,       // email the submitter if an entry is rejected
   MAX_SUBMISSIONS_PER_HOUR: 30,      // simple flood protection
   // Rough box around Blackshaw parish. Submissions outside it are refused.
-  BOUNDS: { south: 53.715, north: 53.775, west: -2.115, east: -2.015 }
+  BOUNDS: { south: 53.728, north: 53.767, west: -2.137, east: -2.024 }
 };
 
 const SHEET_NAME = "Submissions";
