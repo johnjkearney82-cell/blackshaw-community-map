@@ -4,7 +4,7 @@
 // "Add your house" form explains that submissions aren't switched on yet.
 window.MAP_CONFIG = {
   // e.g. "https://script.google.com/macros/s/AKfycb.../exec"
-  appsScriptUrl: "https://script.google.com/macros/s/AKfycbxiAgNoR3cPxL0Yylo5GG12OQxwqBVaQh5Kr08Qt5RQizGz-4s0_g-kMtNAD7mMeawzfg/exec",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbzlmQJtKVmHLzW1wX2BKKeoujCvwhdcYb3LkqsBthIXvpblryCET2Y7d8CgqxtzEll2pQ/exec",
 
   // Parish boundary. A copy saved in this repo is used first; if it's missing,
   // the map asks MapIt (mySociety) for Blackshaw civil parish (area 59191).
