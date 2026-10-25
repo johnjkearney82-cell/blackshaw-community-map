@@ -37,6 +37,13 @@ const STATUSES = ["Pending", "Approved", "Rejected"];
 
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || "houses";
+  if (action === "status") {
+    // quick health check: which sheet the web app can see (no personal data)
+    try {
+      const ss = book_();
+      return json_({ ok: true, sheet: ss.getName(), tabs: ss.getSheets().map(t => t.getName()), houses: approvedHouses_().length });
+    } catch (err) { return json_({ ok: false, error: String(err.message || err) }); }
+  }
   if (action !== "houses") return json_({ ok: false, error: "Unknown request." });
   const cache = CacheService.getScriptCache();
   const hit = cache.get("houses");
@@ -133,7 +140,7 @@ function sendMissedEmails() {
   const sh = sheet_();
   for (let r = 2; r <= sh.getLastRow(); r++) processRow_(sh, r);
   CacheService.getScriptCache().remove("houses");
-  SpreadsheetApp.getActive().toast("Done. Any missed approval emails have been sent.");
+  book_().toast("Done. Any missed approval emails have been sent.");
 }
 
 function processRow_(sh, r) {
@@ -187,6 +194,7 @@ function approvedHouses_() {
 /** Run once from the Apps Script editor. Safe to run again. */
 function setup() {
   const ss = SpreadsheetApp.getActive();
+  PropertiesService.getScriptProperties().setProperty("SHEET_ID", ss.getId());
   let sh = ss.getSheetByName(SHEET_NAME);
   if (!sh) sh = ss.insertSheet(SHEET_NAME, 0);
   sh.getRange(1, 1, 1, COLS.length).setValues([COLS]).setFontWeight("bold").setBackground("#e9ecdc");
@@ -228,13 +236,29 @@ function onOpen() {
 
 /* ---------------- helpers ---------------- */
 
+/** The spreadsheet this script belongs to. setup() remembers its ID, so the web app
+ *  always finds it, even where Google doesn't report an "active" spreadsheet. */
+function book_() {
+  let ss = null;
+  try { ss = SpreadsheetApp.getActive(); } catch (err) {}
+  if (ss) return ss;
+  const id = PropertiesService.getScriptProperties().getProperty("SHEET_ID");
+  if (id) return SpreadsheetApp.openById(id);
+  throw new Error("Open the sheet, go to Extensions > Apps Script, and run setup() from there.");
+}
+/** The Submissions tab, created with its headings if it's missing. */
 function sheet_() {
-  const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
-  if (!sh) throw new Error("Run setup() first.");
+  const ss = book_();
+  let sh = ss.getSheetByName(SHEET_NAME);
+  if (!sh) {
+    sh = ss.insertSheet(SHEET_NAME, 0);
+    sh.getRange(1, 1, 1, COLS.length).setValues([COLS]).setFontWeight("bold").setBackground("#e9ecdc");
+    sh.setFrozenRows(1);
+  }
   return sh;
 }
 function notifyAdmin_(id, name, lane, note, lat, lng) {
-  const url = SpreadsheetApp.getActive().getUrl();
+  const url = book_().getUrl();
   send_(SETTINGS.ADMIN_EMAIL, "New house to approve: " + name,
     "A neighbour has added a house to the " + SETTINGS.MAP_NAME + ".\n\n" +
     "House name: " + name + "\nLane: " + (lane || "Not given") + "\nHow to spot it: " + (note || "Not given") + "\n" +
