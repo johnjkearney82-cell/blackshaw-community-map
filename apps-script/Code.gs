@@ -276,3 +276,10 @@ function clean_(s, max) { return String(s == null ? "" : s).replace(/[\u0000-\u0
 function safeCell_(s) { s = String(s || ""); return /^[=+\-@]/.test(s) ? "'" + s : s; }
 function unsafeCell_(s) { s = String(s || ""); return s.charAt(0) === "'" ? s.slice(1) : s; }
 function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+
+/** Run from the editor to check email works. Unlike the map's emails, this shows any error. */
+function testEmail() {
+  MailApp.sendEmail({ to: SETTINGS.ADMIN_EMAIL, subject: "Test from the " + SETTINGS.MAP_NAME,
+    body: "If you can read this, approval alerts can reach " + SETTINGS.ADMIN_EMAIL + ".\n\nEmails left today: " + MailApp.getRemainingDailyQuota() });
+  console.log("Sent a test email to " + SETTINGS.ADMIN_EMAIL + ". Emails left today: " + MailApp.getRemainingDailyQuota());
+}
