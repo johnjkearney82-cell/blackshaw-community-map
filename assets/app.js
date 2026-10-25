@@ -201,11 +201,44 @@
       CFG.contactEmail ? h("p", {}, "To correct or remove a house, email " + CFG.contactEmail + ".") : null);
   }
 
+  /* phone helpers: search results drop down under the search box, and a floating
+     button takes people from the map to the details below it */
+  const isWide = () => window.matchMedia("(min-width:900px)").matches;
+  const drop = document.getElementById("drop");
+  const nextBtn = document.getElementById("toForm");
+  let sheetInView = false;
+  function renderDrop() {
+    const q = query.trim();
+    drop.textContent = "";
+    if (!q || mode !== "browse" || selId || isWide()) { drop.hidden = true; return; }
+    const res = matches();
+    if (res.length) drop.append(h("p", { class: "eyebrow" }, res.length + (res.length === 1 ? " match" : " matches")), list(res));
+    else drop.append(
+      h("p", { class: "eyebrow" }, "No matches"),
+      h("p", { class: "empty" }, "“" + q + "” isn't on the map yet. If it's your house, add it so the next driver can find it."),
+      h("div", { class: "actions", style: "margin-bottom:8px" }, h("button", { class: "btn primary", type: "button", onclick: () => startAdd(q) }, "Add “" + q + "”")));
+    drop.hidden = false;
+  }
+  function updateNext() {
+    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+    const show = !isWide() && !sheetInView && !atBottom && (mode === "add" || !!selId);
+    nextBtn.hidden = !show;
+    nextBtn.textContent = mode === "add" ? "Next: add the details ↓" : "See details and directions ↓";
+  }
+  nextBtn.onclick = () => {
+    sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (mode === "add") setTimeout(() => { const el = document.getElementById("f-name"); if (el && !el.value) try { el.focus({ preventScroll: true }); } catch (_) {} }, 450);
+  };
+  window.addEventListener("scroll", () => { if (!nextBtn.hidden || mode === "add" || selId) updateNext(); }, { passive: true });
+  if (window.IntersectionObserver) new IntersectionObserver(es => { sheetInView = es[0].isIntersecting; updateNext(); }, { rootMargin: "0px 0px -45% 0px" }).observe(sheet);
+
   function renderSheet() {
+    renderDrop();
     sheet.textContent = "";
     appEl.classList.toggle("has-sel", !!selId);
     appEl.classList.toggle("adding", mode === "add");
     document.getElementById("addBtn").textContent = mode === "add" ? "Cancel" : "Add your house";
+    updateNext();
     if (mode === "add") { sheet.appendChild(addForm()); return; }
     const sel = all().find(p => p.id === selId);
     if (sel) { sheet.appendChild(placeCard(sel)); return; }
@@ -272,7 +305,7 @@
         h("button", { class: "btn primary", type: "submit", disabled: off || sending }, sending ? "Sending…" : "Send for approval"),
         h("button", { class: "btn ghost", type: "button", onclick: cancelAdd }, "Cancel")));
     f.addEventListener("submit", e => { e.preventDefault(); submitHouse(); });
-    setTimeout(() => { try { (addDraft.name ? emailIn : nameIn).focus({ preventScroll: true }); } catch (_) {} }, 0);
+    if (isWide()) setTimeout(() => { try { (addDraft.name ? emailIn : nameIn).focus({ preventScroll: true }); } catch (_) {} }, 0);
     return f;
   }
 
@@ -282,6 +315,7 @@
     document.getElementById("cross").hidden = true; document.getElementById("addhint").hidden = true;
     const o = id && markers.get(id);
     if (o && fly) map.flyTo(o.marker.getLatLng(), Math.max(map.getZoom(), 17), { duration: .6 });
+    if (fly && !isWide()) { try { document.getElementById("q").blur(); } catch (_) {} window.scrollTo({ top: 0, behavior: "smooth" }); }
     try { history.replaceState(null, "", id ? "#h/" + id : location.pathname + location.search); } catch (_) {}
     refreshSelection(); scheduleDeclutter(); renderSheet();
   }
@@ -291,6 +325,7 @@
     addStartedAt = Date.now();
     document.getElementById("cross").hidden = false; document.getElementById("addhint").hidden = false;
     if (map.getZoom() < 16) map.flyTo(map.getCenter(), 16, { duration: .5 });
+    if (!isWide()) { try { document.getElementById("q").blur(); } catch (_) {} window.scrollTo({ top: 0, behavior: "smooth" }); }
     renderSheet();
   }
   function cancelAdd() {
@@ -323,6 +358,7 @@
         renderSheet();
         sheet.prepend(h("p", { class: "msg ok", role: "status", style: "margin-bottom:10px" },
           "Thanks. " + name + " has been sent for approval. We'll email you when it's on the map."));
+        if (!isWide()) sheet.scrollIntoView({ behavior: "smooth", block: "start" });
         addDraft = blankDraft();
       } else {
         addMsg = { type: "err", text: (j && j.error) || "That didn't go through. Check the details and try again." };
@@ -374,8 +410,13 @@
     query = qIn.value;
     if (mode === "add") cancelAdd();
     selId = null; refreshSelection(); renderSheet();
-    const res = matches(); if (res.length === 1) select(res[0].id, true);
+    if (isWide()) { const res = matches(); if (res.length === 1) select(res[0].id, true); }
   });
+  qIn.addEventListener("focus", () => { if (mode === "browse" && selId && query.trim()) { selId = null; refreshSelection(); renderSheet(); } else renderDrop(); });
+  qIn.addEventListener("keydown", e => { if (e.key === "Escape") { qIn.value = ""; query = ""; renderSheet(); } });
+  // tapping anywhere outside the header closes the drop-down
+  document.addEventListener("pointerdown", e => { if (!drop.hidden && !e.target.closest("header")) drop.hidden = true; });
+  window.matchMedia("(min-width:900px)").addEventListener("change", () => { renderSheet(); map.invalidateSize(); });
   map.on("click", () => { if (mode === "browse" && selId) select(null); });
   if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize()).observe(mapEl);
 

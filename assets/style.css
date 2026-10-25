@@ -33,15 +33,17 @@
   color-scheme:dark}}
 
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow-x:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 [hidden]{display:none!important}
 
-.app{height:100%;display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:1fr;padding-top:env(safe-area-inset-top,0px)}
+/* phone: an ordinary scrolling page — header, map, then details below */
+.app{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.app header{order:1}.app .mapwrap{order:2;flex:none}.app .sheet{order:3}
 .side{display:contents}
-header{grid-row:1;background:var(--paper);border-bottom:1px solid var(--line);
+header{position:relative;background:var(--paper);border-bottom:1px solid var(--line);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;
   display:grid;gap:10px;z-index:1001}
 .brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -65,7 +67,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:1.35rem;line-height:1.
 .btn[disabled]{opacity:.55;cursor:not-allowed}
 .btn.ghost{background:transparent}
 
-.mapwrap{grid-row:2;position:relative;min-height:0;overflow:hidden;background:var(--field1)}
+.mapwrap{position:relative;height:55vh;height:55svh;min-height:280px;overflow:hidden;background:var(--field1);isolation:isolate}
 #map{position:absolute;inset:0;background:var(--field1);font-family:var(--f-body)}
 .leaflet-tile-pane{filter:var(--tiles)}
 .leaflet-container a{color:var(--focus)}
@@ -109,7 +111,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:1.35rem;line-height:1.
 .addhint{position:absolute;left:50%;transform:translateX(-50%);top:12px;background:var(--target);color:#fff;padding:8px 12px;border-radius:8px;font-size:.9rem;font-weight:700;z-index:1001;max-width:calc(100% - 130px);text-align:center}
 .toast{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:8px;font-size:.9rem;z-index:1002;max-width:calc(100% - 32px)}
 
-.sheet{grid-row:3;background:var(--paper);border-top:1px solid var(--line);max-height:46vh;overflow:auto;
+.sheet{background:var(--paper);border-top:1px solid var(--line);scroll-margin-top:8px;min-height:60vh;min-height:60svh;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(14px + env(safe-area-inset-bottom,0px));z-index:1001}
 .eyebrow{font-family:var(--f-hand);font-size:1rem;color:var(--muted);margin:0 0 6px}
 .results{list-style:none;margin:0;padding:0;display:grid}
@@ -141,7 +143,19 @@ form textarea{min-height:64px;resize:vertical}
 .about p{margin:0 0 6px}
 .about a{color:inherit}
 
+/* phone: search results drop down under the search box, above the map, so the keyboard never hides them */
+.drop{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:calc(100% - 6px);z-index:1002;
+  max-height:min(60vh,420px);max-height:min(60svh,420px);overflow:auto;overscroll-behavior:contain;background:var(--paper);border:1px solid var(--wall);border-radius:8px;
+  padding:6px 12px;box-shadow:3px 3px 0 color-mix(in srgb,var(--wall) 35%,transparent)}
+.drop .eyebrow{margin:4px 0 2px}
+.drop .empty{margin:4px 0 10px}
+.tonext{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(30px + env(safe-area-inset-bottom,0px));z-index:1001;border:0;border-radius:999px;
+  background:var(--heather);color:var(--paper);font-weight:700;padding:11px 18px;box-shadow:0 2px 8px color-mix(in srgb,var(--ink) 30%,transparent);cursor:pointer;white-space:nowrap}
+
 /* full screen: map only, details float as a card */
+.app.full{position:fixed;inset:0;z-index:2000;display:grid;background:var(--field1);padding-top:env(safe-area-inset-top,0px)}
+.app.full .mapwrap{height:auto;min-height:0}
+.app.full .drop,.app.full .tonext{display:none!important}
 .app.full{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
 .app.full .side{display:contents!important}
 .app.full header{display:none}
@@ -149,11 +163,15 @@ form textarea{min-height:64px;resize:vertical}
 .app.full .sheet{display:none}
 .app.full.has-sel .sheet,.app.full.adding .sheet{display:block;position:fixed;z-index:1003;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:460px;max-height:50vh;border:1px solid var(--wall);border-radius:6px;box-shadow:3px 3px 0 color-mix(in srgb,var(--wall) 35%,transparent)}
 
+/* desktop: fixed app with a sidebar */
 @media (min-width:900px){
-  .app{grid-template-columns:380px 1fr;grid-template-rows:1fr}
+  html,body{height:100%}
+  body{overflow:hidden}
+  .app{height:100%;display:grid;grid-template-columns:380px 1fr;grid-template-rows:1fr}
   .side{display:grid;grid-template-rows:auto 1fr;grid-column:1;grid-row:1;min-height:0;border-right:1px solid var(--line);background:var(--paper)}
-  .sheet{grid-row:2;max-height:none;border-top:0}
-  .mapwrap{grid-column:2;grid-row:1}
+  .sheet{grid-row:2;overflow:auto;border-top:0;padding-bottom:14px;min-height:0}
+  .mapwrap{grid-column:2;grid-row:1;height:auto;min-height:0}
+  .drop,.tonext{display:none!important}
 }
 @media (max-width:420px){.legend{font-size:.8rem;padding:6px 8px}.addhint{max-width:calc(100% - 110px)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -165,3 +183,4 @@ form textarea{min-height:64px;resize:vertical}
 .doc h2{font-family:var(--f-display);font-weight:400;font-size:1.2rem;margin:24px 0 6px}
 .doc p,.doc li{max-width:65ch}
 .doc a{color:var(--focus)}
+.app.adding .legend{display:none}
