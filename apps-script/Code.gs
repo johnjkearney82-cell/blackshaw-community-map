@@ -16,7 +16,7 @@
  */
 
 const SETTINGS = {
-  ADMIN_EMAIL: "johnjkearney82@gmail.com",          // who gets "new house to approve" emails
+  ADMIN_EMAIL: "bernsteen@gmail.com",               // who gets "new house to approve" emails
   MAP_URL: "https://johnjkearney82-cell.github.io/blackshaw-community-map/", // your live map
   MAP_NAME: "Blackshaw Head Community Map",
   DELETE_EMAIL_AFTER_NOTIFY: true,   // remove the owner's email once they've been told

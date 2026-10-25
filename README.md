@@ -38,7 +38,7 @@ At this point the map works, with listed buildings only. The "Add your house" fo
 
 ### 2. Create the approval sheet
 
-1. Sign in to Google as **johnjkearney82@gmail.com** (the admin account) and create a new sheet at [sheets.new](https://sheets.new). Name it *Blackshaw Community Map – Submissions*.
+1. Sign in to Google as **bernsteen@gmail.com** (the admin account, which owns the sheet and sends the emails) and create a new sheet at [sheets.new](https://sheets.new). Name it *Blackshaw Community Map – Submissions*.
 2. Choose **Extensions → Apps Script**. Delete what's in the editor, paste in everything from `apps-script/Code.gs`, and click **Save**.
 3. Near the top of the script, change `MAP_URL` to your live map address from step 1.4.
 4. In the toolbar's function menu, choose **setup**, then click **Run**.
