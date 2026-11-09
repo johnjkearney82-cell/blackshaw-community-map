@@ -7,7 +7,7 @@ A map of house names in Blackshaw parish (Blackshaw Head, HX7) so delivery drive
 - Map: Leaflet 1.9.4 vendored in `vendor/leaflet/`, OpenStreetMap tiles (warm CSS filter for the illustrated look).
 - Data: `data/listed-buildings.json` (Historic England listed buildings), `data/parish-boundary.geojson` (optional local copy; falls back to MapIt area 59191).
 - Approvals: Google Apps Script in `apps-script/Code.gs`, bound to a Google Sheet ("Submissions" tab). Its web app URL goes in `config.js` → `appsScriptUrl`.
-- Hosting: GitHub Pages from `main`, root. Live at https://johnjkearney82-cell.github.io/blackshaw-community-map/
+- Hosting: GitHub Pages from `main`, root. Live at https://blackshawheadmap.org.uk/
 
 ## Working on it
 ```bash

@@ -17,7 +17,7 @@
 
 const SETTINGS = {
   ADMIN_EMAIL: "bernsteen@gmail.com",               // who gets "new house to approve" emails
-  MAP_URL: "https://johnjkearney82-cell.github.io/blackshaw-community-map/", // your live map
+  MAP_URL: "https://blackshawheadmap.org.uk/", // your live map
   MAP_NAME: "Blackshaw Head Community Map",
   DELETE_EMAIL_AFTER_NOTIFY: true,   // remove the owner's email once they've been told
   SEND_ACKNOWLEDGEMENT: true,        // "thanks, we've received it" email to the submitter

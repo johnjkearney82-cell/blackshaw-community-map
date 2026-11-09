@@ -32,7 +32,7 @@ Allow about 30 minutes. You need a GitHub account and the Google account that wi
 1. On GitHub, create a new **public** repository called `blackshaw-community-map`. Don't add a README, since this folder has one.
 2. On the empty repository page, choose **uploading an existing file**. Drag in everything inside this folder (not the folder itself) and commit.
 3. Go to **Settings → Pages**. Under "Build and deployment", set **Source** to *Deploy from a branch*, branch **main**, folder **/ (root)**, then **Save**.
-4. After a minute or two the site is live at `https://johnjkearney82-cell.github.io/blackshaw-community-map/`.
+4. After a minute or two the site is live at `https://blackshawheadmap.org.uk/`.
 
 At this point the map works, with listed buildings only. The "Add your house" form says submissions aren't switched on yet.
 
